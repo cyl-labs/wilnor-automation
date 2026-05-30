@@ -137,6 +137,7 @@
       "position": [1440, 420],
       "parameters": {
         "operation": "update",
+        "authentication": "serviceAccount",
         "documentId": {
           "__rl": true,
           "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw",
