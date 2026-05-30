@@ -133,7 +133,7 @@
       "id": "a2b3c4d5-e6f7-8901-abcd-ef2345678901",
       "name": "Merge",
       "type": "n8n-nodes-base.merge",
-      "typeVersion": 3,
+      "typeVersion": 1,
       "position": [1440, 300],
       "parameters": {
         "mode": "waitForAll",
