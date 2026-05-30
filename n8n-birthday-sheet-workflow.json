@@ -122,8 +122,14 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ summary: \"🎂 \" + $json.EMPLOYER_NAME + \" Birthday\", start: { date: $json.EMPLOYER_NEXT_BIRTHDAY }, end: { date: $json.EMPLOYER_NEXT_BIRTHDAY_PLUS_ONE }, recurrence: [\"RRULE:FREQ=YEARLY\"], reminders: { useDefault: false, overrides: [{ method: \"popup\", minutes: 1440 }] } }) }}",
-        "options": {}
+        "body": "={{ JSON.stringify({ iCalUID: 'bd-emp-' + $json.EMPLOYER_NAME.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '@wilnor', summary: \"🎂 \" + $json.EMPLOYER_NAME + \" Birthday\", start: { date: $json.EMPLOYER_NEXT_BIRTHDAY }, end: { date: $json.EMPLOYER_NEXT_BIRTHDAY_PLUS_ONE }, recurrence: [\"RRULE:FREQ=YEARLY\"], reminders: { useDefault: false, overrides: [{ method: \"popup\", minutes: 1440 }] } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "credentials": {
         "googleApi": {
@@ -159,8 +165,14 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ summary: \"🎂 \" + $('Parse Dates').item.json.MAID_NAME + \" Birthday\", start: { date: $('Parse Dates').item.json.MAID_NEXT_BIRTHDAY }, end: { date: $('Parse Dates').item.json.MAID_NEXT_BIRTHDAY_PLUS_ONE }, recurrence: [\"RRULE:FREQ=YEARLY\"], reminders: { useDefault: false, overrides: [{ method: \"popup\", minutes: 1440 }] } }) }}",
-        "options": {}
+        "body": "={{ JSON.stringify({ iCalUID: 'bd-maid-' + $('Parse Dates').item.json.MAID_NAME.toLowerCase().replace(/\\s+/g,'-').replace(/[^a-z0-9-]/g,'') + '@wilnor', summary: \"🎂 \" + $('Parse Dates').item.json.MAID_NAME + \" Birthday\", start: { date: $('Parse Dates').item.json.MAID_NEXT_BIRTHDAY }, end: { date: $('Parse Dates').item.json.MAID_NEXT_BIRTHDAY_PLUS_ONE }, recurrence: [\"RRULE:FREQ=YEARLY\"], reminders: { useDefault: false, overrides: [{ method: \"popup\", minutes: 1440 }] } }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
       },
       "credentials": {
         "googleApi": {
