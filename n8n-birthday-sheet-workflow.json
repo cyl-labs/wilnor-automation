@@ -179,7 +179,7 @@
         "method": "POST",
         "url": "https://sheets.googleapis.com/v4/spreadsheets/150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw/values:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
@@ -187,7 +187,7 @@
         "options": {}
       },
       "credentials": {
-        "googleSheetsOAuth2Api": {
+        "googleApi": {
           "id": "hJIK4knNVdFbbeYJ",
           "name": "Wilnor Sheets API"
         }
