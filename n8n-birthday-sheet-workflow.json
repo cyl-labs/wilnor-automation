@@ -8,14 +8,14 @@
       "typeVersion": 1,
       "position": [240, 300],
       "parameters": {
-        "documentId": "1mezistiRiFdQ4dy7oYMmDfeQ0HMNvz9mTuQmoMt3ntA",
+        "documentId": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw",
         "sheetName": "Sheet1",
         "event": "rowAdded",
         "options": {}
       },
       "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "Wilnor Google Sheets",
+        "googleApi": {
+          "id": "f6Q4PxwGkNXhXXUJ",
           "name": "Wilnor Google Sheets"
         }
       }
