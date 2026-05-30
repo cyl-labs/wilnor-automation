@@ -136,7 +136,7 @@
       "typeVersion": 1,
       "position": [1440, 300],
       "parameters": {
-        "mode": "waitForAll",
+        "mode": "wait",
         "numberInputs": 2
       }
     },
