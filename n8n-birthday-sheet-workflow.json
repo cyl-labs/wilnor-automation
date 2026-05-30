@@ -21,20 +21,28 @@
     {
       "id": "e5f6a7b8-c9d0-1234-ef01-234567890123",
       "name": "Read Sheet",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
       "position": [460, 300],
       "parameters": {
-        "method": "GET",
-        "url": "https://sheets.googleapis.com/v4/spreadsheets/150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw/values/Sheet1!A:D",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
-        "options": {}
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "options": {},
+        "authentication": "serviceAccount"
       },
       "credentials": {
         "googleApi": {
           "id": "f6Q4PxwGkNXhXXUJ",
-          "name": "Wilnor Google Sheets"
+          "name": "Sheets API"
         }
       }
     },
@@ -45,7 +53,7 @@
       "typeVersion": 2,
       "position": [680, 300],
       "parameters": {
-        "jsCode": "// Persists the last-seen row count across executions so only truly new rows are processed.\nconst staticData = $getWorkflowStaticData('global');\nconst lastRow = typeof staticData.lastRow === 'number' ? staticData.lastRow : 1;\n\nconst response = $input.first().json;\nconst values = response.values || [];\n\n// Always update the pointer, even if there are no new rows.\nstaticData.lastRow = values.length;\n\n// values[0] is the header row; anything before lastRow was already processed.\nif (values.length <= 1 || values.length <= lastRow) return [];\n\nconst headers = values[0];\nconst newRows = values.slice(lastRow);\n\nreturn newRows.map(function(row) {\n  const item = {};\n  headers.forEach(function(h, i) { item[h] = row[i] || ''; });\n  return { json: item };\n});\n",
+        "jsCode": "// Native googleSheets node outputs one item per data row (headers already mapped as keys).\n// Static data persists the last-seen row count so only new rows are forwarded.\nconst staticData = $getWorkflowStaticData('global');\nconst lastRow = typeof staticData.lastRow === 'number' ? staticData.lastRow : 0;\n\nconst allRows = $input.all().map(i => i.json);\nstaticData.lastRow = allRows.length;\n\nconst newRows = allRows.slice(lastRow);\nif (newRows.length === 0) return [];\n\nreturn newRows.map(row => ({ json: row }));\n",
         "mode": "runOnceForAllItems"
       }
     },
