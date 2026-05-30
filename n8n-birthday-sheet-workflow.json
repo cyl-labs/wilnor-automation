@@ -53,7 +53,7 @@
       "typeVersion": 2,
       "position": [680, 300],
       "parameters": {
-        "jsCode": "// Filter rows where BD Created is blank/missing (unprocessed).\n// Blank or absent BD Created = unprocessed; 'yes' = already done.\n// Cap at 10 rows per cycle to avoid rate limits.\n// ROW_NUMBER = array index + 2 (row 1 is headers, data starts row 2).\nconst allRows = $input.all().map((i, idx) => ({ ...i.json, _idx: idx }));\nconst newRows = allRows.filter(row => {\n  const bdCreated = String(row['BD Created'] || '').trim().toLowerCase();\n  return bdCreated !== 'yes';\n});\nif (newRows.length === 0) return [];\nreturn newRows.slice(0, 10).map(row => {\n  const { _idx, ...rest } = row;\n  return { json: { ...rest, ROW_NUMBER: _idx + 2 } };\n});\n",
+        "jsCode": "// Filter rows where BD Created is blank/missing (unprocessed).\n// Blank or absent BD Created = unprocessed; 'yes' = already done.\n// Cap at 5 rows per cycle to stay within Calendar API rate limits.\n// ROW_NUMBER = array index + 2 (row 1 is headers, data starts row 2).\nconst allRows = $input.all().map((i, idx) => ({ ...i.json, _idx: idx }));\nconst newRows = allRows.filter(row => {\n  const bdCreated = String(row['BD Created'] || '').trim().toLowerCase();\n  return bdCreated !== 'yes';\n});\nif (newRows.length === 0) return [];\nreturn newRows.slice(0, 5).map(row => {\n  const { _idx, ...rest } = row;\n  return { json: { ...rest, ROW_NUMBER: _idx + 2 } };\n});\n",
         "mode": "runOnceForAllItems"
       }
     },
@@ -70,15 +70,15 @@
     },
     {
       "id": "e9f0a1b2-c3d4-5678-90ef-ab1234567890",
-      "name": "Wait",
+      "name": "Wait Before Employer",
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1010, 300],
+      "position": [1100, 300],
       "webhookId": "f1e2d3c4-b5a6-7890-fedc-ba9876543210",
       "parameters": {
         "resume": "timeInterval",
         "unit": "seconds",
-        "amount": 1
+        "amount": 2
       }
     },
     {
@@ -86,7 +86,7 @@
       "name": "Create Employer Birthday Event",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1220, 160],
+      "position": [1300, 300],
       "parameters": {
         "method": "POST",
         "url": "https://www.googleapis.com/calendar/v3/calendars/1bcd8afe952f52ea0994235d6d53dc6f902982e875c293a32e5c4d0ea3891dc7@group.calendar.google.com/events",
@@ -106,11 +106,24 @@
       }
     },
     {
+      "id": "b3c4d5e6-f7a8-9012-bcde-f23456789013",
+      "name": "Wait Before Maid",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1500, 300],
+      "webhookId": "a2b3c4d5-e6f7-8901-abcd-ef2345678902",
+      "parameters": {
+        "resume": "timeInterval",
+        "unit": "seconds",
+        "amount": 2
+      }
+    },
+    {
       "id": "d4e5f6a7-b8c9-0123-def0-123456789012",
       "name": "Create Maid Birthday Event",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1220, 440],
+      "position": [1700, 300],
       "parameters": {
         "method": "POST",
         "url": "https://www.googleapis.com/calendar/v3/calendars/ef053e49c2a24e3cc987c45294f0db9afd1f132fb45a2f801df64f8261dc1f6e@group.calendar.google.com/events",
@@ -119,7 +132,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ summary: \"🎂 \" + $json.MAID_NAME + \" Birthday\", start: { date: $json.MAID_NEXT_BIRTHDAY }, end: { date: $json.MAID_NEXT_BIRTHDAY_PLUS_ONE }, recurrence: [\"RRULE:FREQ=YEARLY\"], reminders: { useDefault: false, overrides: [{ method: \"popup\", minutes: 1440 }] } }) }}",
+        "body": "={{ JSON.stringify({ summary: \"🎂 \" + $('Parse Dates').item.json.MAID_NAME + \" Birthday\", start: { date: $('Parse Dates').item.json.MAID_NEXT_BIRTHDAY }, end: { date: $('Parse Dates').item.json.MAID_NEXT_BIRTHDAY_PLUS_ONE }, recurrence: [\"RRULE:FREQ=YEARLY\"], reminders: { useDefault: false, overrides: [{ method: \"popup\", minutes: 1440 }] } }) }}",
         "options": {}
       },
       "credentials": {
@@ -130,22 +143,11 @@
       }
     },
     {
-      "id": "a2b3c4d5-e6f7-8901-abcd-ef2345678901",
-      "name": "Merge",
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 1,
-      "position": [1440, 300],
-      "parameters": {
-        "mode": "wait",
-        "numberInputs": 2
-      }
-    },
-    {
       "id": "f0a1b2c3-d4e5-6789-0fab-c1234567890a",
       "name": "Write Back to Sheet",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [1660, 300],
+      "position": [1900, 300],
       "parameters": {
         "operation": "update",
         "authentication": "serviceAccount",
@@ -179,97 +181,28 @@
   ],
   "connections": {
     "Schedule Trigger": {
-      "main": [
-        [
-          {
-            "node": "Read Sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Read Sheet", "type": "main", "index": 0 }]]
     },
     "Read Sheet": {
-      "main": [
-        [
-          {
-            "node": "Filter New Rows",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Filter New Rows", "type": "main", "index": 0 }]]
     },
     "Filter New Rows": {
-      "main": [
-        [
-          {
-            "node": "Parse Dates",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Parse Dates", "type": "main", "index": 0 }]]
     },
     "Parse Dates": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Wait Before Employer", "type": "main", "index": 0 }]]
     },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Create Employer Birthday Event",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Create Maid Birthday Event",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+    "Wait Before Employer": {
+      "main": [[{ "node": "Create Employer Birthday Event", "type": "main", "index": 0 }]]
     },
     "Create Employer Birthday Event": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Wait Before Maid", "type": "main", "index": 0 }]]
+    },
+    "Wait Before Maid": {
+      "main": [[{ "node": "Create Maid Birthday Event", "type": "main", "index": 0 }]]
     },
     "Create Maid Birthday Event": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "Write Back to Sheet",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
+      "main": [[{ "node": "Write Back to Sheet", "type": "main", "index": 0 }]]
     }
   },
   "active": false,
