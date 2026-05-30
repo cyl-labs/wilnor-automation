@@ -179,7 +179,7 @@
         "method": "POST",
         "url": "https://sheets.googleapis.com/v4/spreadsheets/150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw/values:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
@@ -187,9 +187,9 @@
         "options": {}
       },
       "credentials": {
-        "googleApi": {
-          "id": "FAmftf6yqsKi64cP",
-          "name": "Wilnor Google Calendar"
+        "googleSheetsOAuth2Api": {
+          "id": "hJIK4knNVdFbbeYJ",
+          "name": "Wilnor Sheets API"
         }
       }
     }
