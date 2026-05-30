@@ -69,6 +69,33 @@
       }
     },
     {
+      "id": "c5d6e7f8-a9b0-1234-cdef-012345678903",
+      "name": "Filter Valid Dates",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567801",
+              "leftValue": "={{ $json.EMPLOYER_NEXT_BIRTHDAY }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            },
+            {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567802",
+              "leftValue": "={{ $json.MAID_NEXT_BIRTHDAY }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
       "id": "e9f0a1b2-c3d4-5678-90ef-ab1234567890",
       "name": "Wait Before Employer",
       "type": "n8n-nodes-base.wait",
@@ -193,6 +220,9 @@
       "main": [[{ "node": "Parse Dates", "type": "main", "index": 0 }]]
     },
     "Parse Dates": {
+      "main": [[{ "node": "Filter Valid Dates", "type": "main", "index": 0 }]]
+    },
+    "Filter Valid Dates": {
       "main": [[{ "node": "Wait Before Employer", "type": "main", "index": 0 }]]
     },
     "Wait Before Employer": {
