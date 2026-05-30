@@ -53,7 +53,7 @@
       "typeVersion": 2,
       "position": [680, 300],
       "parameters": {
-        "jsCode": "// Native googleSheets node outputs one item per data row (headers already mapped as keys).\n// Static data persists the last-seen row count so only new rows are forwarded.\nconst staticData = $getWorkflowStaticData('global');\nconst lastRow = typeof staticData.lastRow === 'number' ? staticData.lastRow : 0;\n\nconst allRows = $input.all().map(i => i.json);\nstaticData.lastRow = allRows.length;\n\nconst newRows = allRows.slice(lastRow);\nif (newRows.length === 0) return [];\n\nreturn newRows.map(row => ({ json: row }));\n",
+        "jsCode": "// Native googleSheets node outputs one item per data row (headers as keys).\n// Try to use static data to track last processed row count; fall back to\n// processing all rows if the task runner does not support static data.\nlet allRows;\ntry {\n  allRows = $input.all().map(i => ({ ...i.json }));\n  const sd  = $getWorkflowStaticData('global');\n  const lastRow = typeof sd.lastRow === 'number' ? sd.lastRow : 0;\n  sd.lastRow = allRows.length;\n  const newRows = allRows.slice(lastRow);\n  if (newRows.length === 0) return [];\n  return newRows.map(row => ({ json: row }));\n} catch(e) {\n  // $getWorkflowStaticData unavailable (task runner) — emit all rows.\n  allRows = allRows || $input.all().map(i => ({ ...i.json }));\n  if (allRows.length === 0) return [];\n  return allRows.map(row => ({ json: row }));\n}\n",
         "mode": "runOnceForAllItems"
       }
     },
