@@ -9,7 +9,7 @@
       "position": [240, 300],
       "parameters": {
         "rule": {
-          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+          "interval": [{ "field": "minutes", "minutesInterval": 1 }]
         }
       }
     },
