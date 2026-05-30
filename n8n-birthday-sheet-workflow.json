@@ -53,7 +53,7 @@
       "typeVersion": 2,
       "position": [680, 300],
       "parameters": {
-        "jsCode": "// Native googleSheets node outputs one item per data row (headers as keys).\n// Try to use static data to track last processed row count; fall back to\n// processing all rows if the task runner does not support static data.\nlet allRows;\ntry {\n  allRows = $input.all().map(i => ({ ...i.json }));\n  const sd  = $getWorkflowStaticData('global');\n  const lastRow = typeof sd.lastRow === 'number' ? sd.lastRow : 0;\n  sd.lastRow = allRows.length;\n  const newRows = allRows.slice(lastRow);\n  if (newRows.length === 0) return [];\n  return newRows.map(row => ({ json: row }));\n} catch(e) {\n  // $getWorkflowStaticData unavailable (task runner) — emit all rows.\n  allRows = allRows || $input.all().map(i => ({ ...i.json }));\n  if (allRows.length === 0) return [];\n  return allRows.map(row => ({ json: row }));\n}\n",
+        "jsCode": "// Native googleSheets node outputs one item per data row (headers as keys).\n// Try to use static data to track last processed row count; fall back to\n// processing all rows if the task runner does not support static data.\nlet allRows;\ntry {\n  allRows = $input.all().map(i => ({ ...i.json }));\n  const sd  = $getWorkflowStaticData('global');\n  const lastRow = typeof sd.lastRow === 'number' ? sd.lastRow : 0;\n  sd.lastRow = allRows.length;\n  const newRows = allRows.slice(lastRow, lastRow + 10);\n  if (newRows.length === 0) return [];\n  return newRows.map(row => ({ json: row }));\n} catch(e) {\n  // $getWorkflowStaticData unavailable (task runner) — emit all rows.\n  allRows = allRows || $input.all().map(i => ({ ...i.json }));\n  if (allRows.length === 0) return [];\n  return allRows.slice(0, 10).map(row => ({ json: row }));\n}\n",
         "mode": "runOnceForAllItems"
       }
     },
@@ -66,6 +66,19 @@
       "parameters": {
         "jsCode": "const row = $input.item.json;\n\nconst employerName = String(row['Employer Name'] || '').trim();\nconst employerBirthdayRaw = String(row['Employer Birthday'] || '').trim();\nconst maidName = String(row['Maid Name'] || '').trim();\nconst maidBirthdayRaw = String(row['Maid Birthday'] || '').trim();\n\nconst monthMap = {\n  jan: 1, january: 1,\n  feb: 2, february: 2,\n  mar: 3, march: 3,\n  apr: 4, april: 4,\n  may: 5,\n  jun: 6, june: 6,\n  jul: 7, july: 7,\n  aug: 8, august: 8,\n  sep: 9, september: 9,\n  oct: 10, october: 10,\n  nov: 11, november: 11,\n  dec: 12, december: 12,\n};\n\nfunction parseDate(str) {\n  if (!str) return null;\n  str = str.trim();\n  const textMatch = str.match(/^(\\d{1,2})\\s+([a-zA-Z]+)\\s+(\\d{4})$/);\n  if (textMatch) {\n    const day   = parseInt(textMatch[1]);\n    const month = monthMap[textMatch[2].toLowerCase()];\n    const year  = parseInt(textMatch[3]);\n    if (month) return year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');\n  }\n  const numMatch = str.match(/^(\\d{1,2})[-\\/](\\d{1,2})[-\\/](\\d{4})$/);\n  if (numMatch) {\n    const day   = parseInt(numMatch[1]);\n    const month = parseInt(numMatch[2]);\n    const year  = parseInt(numMatch[3]);\n    return year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');\n  }\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(str)) return str;\n  return null;\n}\n\nconst pad = n => String(n).padStart(2, '0');\n\nfunction nextBirthday(isoDate) {\n  if (!isoDate) return { next: '', nextPlusOne: '' };\n  const parts  = isoDate.split('-');\n  const bMonth = parseInt(parts[1]) - 1;\n  const bDay   = parseInt(parts[2]);\n  const today  = new Date();\n  let next     = new Date(today.getFullYear(), bMonth, bDay);\n  if (next <= today) next = new Date(today.getFullYear() + 1, bMonth, bDay);\n  const end = new Date(next);\n  end.setDate(end.getDate() + 1);\n  return {\n    next:        next.getFullYear() + '-' + pad(next.getMonth() + 1) + '-' + pad(next.getDate()),\n    nextPlusOne: end.getFullYear()  + '-' + pad(end.getMonth()  + 1) + '-' + pad(end.getDate()),\n  };\n}\n\nconst employerBD = nextBirthday(parseDate(employerBirthdayRaw));\nconst maidBD     = nextBirthday(parseDate(maidBirthdayRaw));\n\nreturn {\n  json: {\n    EMPLOYER_NAME:                   employerName.toUpperCase(),\n    EMPLOYER_NEXT_BIRTHDAY:          employerBD.next,\n    EMPLOYER_NEXT_BIRTHDAY_PLUS_ONE: employerBD.nextPlusOne,\n    MAID_NAME:                       maidName.toUpperCase(),\n    MAID_NEXT_BIRTHDAY:              maidBD.next,\n    MAID_NEXT_BIRTHDAY_PLUS_ONE:     maidBD.nextPlusOne,\n  }\n};\n",
         "mode": "runOnceForEachItem"
+      }
+    },
+    {
+      "id": "e9f0a1b2-c3d4-5678-90ef-ab1234567890",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1010, 300],
+      "webhookId": "f1e2d3c4-b5a6-7890-fedc-ba9876543210",
+      "parameters": {
+        "resume": "timeInterval",
+        "unit": "seconds",
+        "amount": 1
       }
     },
     {
@@ -152,6 +165,17 @@
       ]
     },
     "Parse Dates": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
       "main": [
         [
           {
