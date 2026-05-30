@@ -145,30 +145,18 @@
     {
       "id": "f0a1b2c3-d4e5-6789-0fab-c1234567890a",
       "name": "Write Back to Sheet",
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.5,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [1900, 300],
       "parameters": {
-        "operation": "update",
-        "authentication": "serviceAccount",
-        "documentId": {
-          "__rl": true,
-          "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw",
-          "mode": "id"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": "Form Responses 1",
-          "mode": "name"
-        },
-        "columns": {
-          "mappingMode": "defineBelow",
-          "value": {
-            "Timestamp": "={{ $('Parse Dates').item.json.TIMESTAMP }}",
-            "BD Created": "yes"
-          },
-          "matchingColumns": ["Timestamp"]
-        },
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw/values:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ valueInputOption: \"RAW\", data: [ { range: \"Form Responses 1!AH1\", values: [[\"BD Created\"]] }, { range: \"Form Responses 1!AH\" + $('Parse Dates').item.json.ROW_NUMBER, values: [[\"yes\"]] } ] }) }}",
         "options": {}
       },
       "credentials": {
