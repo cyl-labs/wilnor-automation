@@ -1,0 +1,97 @@
+{
+  "name": "Birthday Reminder Emails",
+  "nodes": [
+    {
+      "id": "r1a2b3c4-d5e6-7890-abcd-ef1234567801",
+      "name": "Daily 8am Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "expression": "0 8 * * *" }]
+        }
+      }
+    },
+    {
+      "id": "r2b3c4d5-e6f7-8901-bcde-f12345678902",
+      "name": "Read Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [460, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Form Responses 1", "mode": "name" },
+        "options": {},
+        "authentication": "serviceAccount"
+      },
+      "credentials": { "googleApi": { "id": "hJIK4knNVdFbbeYJ", "name": "Wilnor Sheets API" } }
+    },
+    {
+      "id": "r3c4d5e6-f7a8-9012-cdef-012345678903",
+      "name": "Find Today Birthdays",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const allRows = $input.all().map(i => ({ ...i.json }));\n\nconst monthMap = {\n  jan:1, january:1, feb:2, february:2, mar:3, march:3,\n  apr:4, april:4, may:5, jun:6, june:6, jul:7, july:7,\n  aug:8, august:8, sep:9, sept:9, september:9,\n  oct:10, october:10, nov:11, november:11, dec:12, december:12,\n};\n\nfunction parseDate(str) {\n  if (!str) return null;\n  str = str.trim();\n  if (/^x+$/i.test(str) || str.startsWith('+')) return null;\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(str)) return str;\n  const textMatch = str.match(/^(\\d{1,2})\\s*[-\\/]?\\s*([a-zA-Z]+)\\.?\\s*[-\\/]?\\s*(\\d{2,4})/);\n  if (textMatch) {\n    const day = parseInt(textMatch[1]);\n    const month = monthMap[textMatch[2].toLowerCase()];\n    let year = parseInt(textMatch[3].substring(0, 4));\n    if (year < 100) year += 1900;\n    if (month && day >= 1 && day <= 31 && year >= 1900)\n      return year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');\n  }\n  const numMatch = str.match(/^(\\d{1,2})\\s*[-\\/\\.]\\s*(\\d{1,2})\\s*[-\\/\\.]\\s*(\\d{4})/);\n  if (numMatch) {\n    const day = parseInt(numMatch[1]), month = parseInt(numMatch[2]), year = parseInt(numMatch[3]);\n    if (month >= 1 && month <= 12 && day >= 1 && day <= 31)\n      return year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');\n  }\n  const spaceMatch = str.match(/^(\\d{1,2})\\s+(\\d{1,2})\\s+(\\d{4})/);\n  if (spaceMatch) {\n    const day = parseInt(spaceMatch[1]), month = parseInt(spaceMatch[2]), year = parseInt(spaceMatch[3]);\n    if (month >= 1 && month <= 12 && day >= 1 && day <= 31)\n      return year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');\n  }\n  return null;\n}\n\nfunction normalizePhone(phone) {\n  if (!phone) return null;\n  let p = String(phone).replace(/[\\s\\-\\(\\)]/g, '');\n  if (p.startsWith('+65')) p = p.slice(3);\n  else if (p.startsWith('65') && p.length === 10) p = p.slice(2);\n  if (p.length === 8 && (p.startsWith('8') || p.startsWith('9'))) return '65' + p;\n  return null;\n}\n\nconst today = new Date();\nconst todayMonth = today.getMonth() + 1;\nconst todayDay = today.getDate();\n\nfunction isTodayBirthday(isoDate) {\n  if (!isoDate) return false;\n  const parts = isoDate.split('-');\n  return parseInt(parts[1]) === todayMonth && parseInt(parts[2]) === todayDay;\n}\n\nconst reminders = [];\nconst seenEmployers = new Set();\nconst seenMaids = new Set();\n\nfor (const row of allRows) {\n  const employerName = String(row['Employer Name'] || '').trim();\n  const maidName = String(row['Maid Name'] || '').trim();\n  const phone = normalizePhone(row['Phone']);\n  const employerBd = parseDate(String(row['Employer Birthday'] || '').trim());\n  const maidBd = parseDate(String(row['Maid Birthday'] || '').trim());\n\n  if (isTodayBirthday(employerBd) && employerName && phone && !seenEmployers.has(employerName.toUpperCase())) {\n    seenEmployers.add(employerName.toUpperCase());\n    const msg = encodeURIComponent('Happy Birthday ' + employerName + '! 🎂 Wishing you a wonderful year ahead. Warm regards, Wiliana');\n    reminders.push({\n      type: 'employer',\n      name: employerName,\n      phone,\n      waLink: 'https://wa.me/' + phone + '?text=' + msg,\n    });\n  }\n\n  if (isTodayBirthday(maidBd) && maidName && employerName && phone && !seenMaids.has(maidName.toUpperCase())) {\n    seenMaids.add(maidName.toUpperCase());\n    const msg = encodeURIComponent('Hi ' + employerName + ', a reminder that today is ' + maidName + '\\'s birthday! 🎂 It would be a lovely gesture to wish her today. Warm regards, Wiliana');\n    reminders.push({\n      type: 'maid',\n      name: maidName,\n      employerName,\n      phone,\n      waLink: 'https://wa.me/' + phone + '?text=' + msg,\n    });\n  }\n}\n\nif (reminders.length === 0) {\n  return [{ json: { HAS_BIRTHDAYS: false, EMAIL_SUBJECT: '', EMAIL_BODY_HTML: '' } }];\n}\n\nconst dateStr = today.toLocaleDateString('en-SG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });\n\nlet html = '<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">';\nhtml += '<h2 style=\"color: #222; border-bottom: 2px solid #eee; padding-bottom: 12px;\">🎂 Birthday Reminders – ' + dateStr + '</h2>';\nhtml += '<p style=\"color: #666;\">You have <strong>' + reminders.length + '</strong> birthday reminder' + (reminders.length > 1 ? 's' : '') + ' today.</p>';\n\nfor (const r of reminders) {\n  const isEmployer = r.type === 'employer';\n  const bg = isEmployer ? '#fff8e1' : '#e8f5e9';\n  const badge = isEmployer ? '👤 Employer Birthday' : '🧹 Helper Birthday';\n  const title = isEmployer ? r.name : r.name;\n  const sub = isEmployer ? '' : '<p style=\"margin: 4px 0 0 0; color: #555; font-size: 14px;\">Employer: ' + r.employerName + '</p>';\n  html += '<div style=\"background: ' + bg + '; border-radius: 10px; padding: 18px 20px; margin: 16px 0; border-left: 4px solid ' + (isEmployer ? '#f9a825' : '#43a047') + ';\">';\n  html += '<p style=\"margin: 0 0 4px 0; font-size: 11px; font-weight: bold; color: #888; text-transform: uppercase; letter-spacing: 1px;\">' + badge + '</p>';\n  html += '<p style=\"margin: 0; font-size: 20px; font-weight: bold; color: #222;\">' + title + '</p>';\n  html += sub;\n  html += '<a href=\"' + r.waLink + '\" style=\"display: inline-block; margin-top: 12px; background: #25D366; color: white; text-decoration: none; padding: 10px 22px; border-radius: 6px; font-size: 14px; font-weight: bold;\">💬 Send WhatsApp →</a>';\n  html += '</div>';\n}\n\nhtml += '</div>';\n\nreturn [{ json: {\n  HAS_BIRTHDAYS: true,\n  EMAIL_SUBJECT: '🎂 ' + reminders.length + ' Birthday Reminder' + (reminders.length > 1 ? 's' : '') + ' – ' + dateStr,\n  EMAIL_BODY_HTML: html,\n} }];\n"
+      }
+    },
+    {
+      "id": "r4d5e6f7-a8b9-0123-defa-123456789004",
+      "name": "Has Birthdays Today",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "r4d5e6f7-a8b9-0123-defa-123456789099",
+              "leftValue": "={{ $json.HAS_BIRTHDAYS }}",
+              "rightValue": true,
+              "operator": { "type": "boolean", "operation": "true" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "r5e6f7a8-b9c0-1234-efab-234567890005",
+      "name": "Send Birthday Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1120, 180],
+      "parameters": {
+        "sendTo": "cyllabsdigital@gmail.com",
+        "subject": "={{ $json.EMAIL_SUBJECT }}",
+        "emailType": "html",
+        "message": "={{ $json.EMAIL_BODY_HTML }}",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GMAIL_CREDENTIAL_ID",
+          "name": "Gmail Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 8am Trigger": { "main": [[{ "node": "Read Sheet", "type": "main", "index": 0 }]] },
+    "Read Sheet": { "main": [[{ "node": "Find Today Birthdays", "type": "main", "index": 0 }]] },
+    "Find Today Birthdays": { "main": [[{ "node": "Has Birthdays Today", "type": "main", "index": 0 }]] },
+    "Has Birthdays Today": {
+      "main": [
+        [{ "node": "Send Birthday Email", "type": "main", "index": 0 }],
+        []
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
