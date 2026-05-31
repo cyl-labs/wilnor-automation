@@ -66,7 +66,7 @@
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $json.SA_NAME, parents: [$json.FOLDER_ID] }) }}"
       },
-      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
     },
     {
       "id": "cg06-fill-sa",
@@ -84,7 +84,7 @@
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
-      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
     },
     {
       "id": "cg07-copy-safety",
@@ -102,7 +102,7 @@
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SAFETY_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
       },
-      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
     },
     {
       "id": "cg08-fill-safety",
@@ -120,7 +120,7 @@
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
-      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
     },
     {
       "id": "cg09-copy-ec",
@@ -138,7 +138,7 @@
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EC_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
       },
-      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
     },
     {
       "id": "cg10-fill-ec",
@@ -156,7 +156,7 @@
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
-      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
     },
     {
       "id": "cg11-writeback",
