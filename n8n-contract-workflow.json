@@ -161,6 +161,159 @@
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
+      "id": "cg13-export-sa",
+      "name": "Export SA PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2440, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy SA').item.json.id }}/export?mimeType=application/pdf",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
+      },
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
+    },
+    {
+      "id": "cg14-upload-sa",
+      "name": "Upload SA to DocuSeal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2660, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sign.cyllabs.com/api/templates",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
+        "sendBody": true,
+        "contentType": "multipartFormData",
+        "bodyParameters": { "parameters": [
+          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
+          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.SA_NAME }}" }
+        ]}
+      }
+    },
+    {
+      "id": "cg15-submit-sa",
+      "name": "Submit SA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2880, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sign.cyllabs.com/api/submissions",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
+      }
+    },
+    {
+      "id": "cg16-export-safety",
+      "name": "Export Safety PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3100, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy Safety').item.json.id }}/export?mimeType=application/pdf",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
+      },
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
+    },
+    {
+      "id": "cg17-upload-safety",
+      "name": "Upload Safety to DocuSeal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3320, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sign.cyllabs.com/api/templates",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
+        "sendBody": true,
+        "contentType": "multipartFormData",
+        "bodyParameters": { "parameters": [
+          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
+          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.SAFETY_NAME }}" }
+        ]}
+      }
+    },
+    {
+      "id": "cg18-submit-safety",
+      "name": "Submit Safety",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3540, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sign.cyllabs.com/api/submissions",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
+      }
+    },
+    {
+      "id": "cg19-export-ec",
+      "name": "Export EC PDF",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3760, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy EC').item.json.id }}/export?mimeType=application/pdf",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
+      },
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
+    },
+    {
+      "id": "cg20-upload-ec",
+      "name": "Upload EC to DocuSeal",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [3980, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sign.cyllabs.com/api/templates",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
+        "sendBody": true,
+        "contentType": "multipartFormData",
+        "bodyParameters": { "parameters": [
+          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
+          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.EC_NAME }}" }
+        ]}
+      }
+    },
+    {
+      "id": "cg21-submit-ec",
+      "name": "Submit EC",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [4200, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "https://sign.cyllabs.com/api/submissions",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
+      }
+    },
+    {
       "id": "cg11-writeback",
       "name": "Write Back",
       "type": "n8n-nodes-base.googleSheets",
@@ -193,7 +346,7 @@
         "sendTo": "cyllabsdigital@gmail.com",
         "subject": "=📄 New Contracts Ready — {{ $('Build Replacements').item.json.EMPLOYER_NAME }} & {{ $('Build Replacements').item.json.MAID_NAME }}",
         "emailType": "html",
-        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">📄 Contracts Ready to Send</h2>' + '<p>Contracts have been generated for <strong>' + $('Build Replacements').item.json.EMPLOYER_NAME + '</strong> and helper <strong>' + $('Build Replacements').item.json.MAID_NAME + '</strong>.</p>' + '<p>Open each document, download as PDF, then upload to DocuSeal to send for signing.</p>' + '<ul style=\"line-height:2;\">' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy SA').item.json.id + '/edit\">Service Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Safety').item.json.id + '/edit\">Safety Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy EC').item.json.id + '/edit\">Employment Contract</a></li>' + '</ul>' + '</div>' }}",
+        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">📄 Contracts Sent for Signing</h2>' + '<p>Contracts have been generated and sent to <strong>' + $('Build Replacements').item.json.EMPLOYER_NAME + '</strong> (' + $('Build Replacements').item.json.EMAIL + ') for signing.</p>' + '<p>They will receive 3 separate signing emails from DocuSeal. You can also review and sign as agency at <a href=\"https://sign.cyllabs.com\">sign.cyllabs.com</a>.</p>' + '<p style=\"margin-top:16px;\"><strong>Google Doc links:</strong></p>' + '<ul style=\"line-height:2;\">' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy SA').item.json.id + '/edit\">Service Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Safety').item.json.id + '/edit\">Safety Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy EC').item.json.id + '/edit\">Employment Contract</a></li>' + '</ul>' + '</div>' }}",
         "options": {}
       },
       "credentials": {
@@ -214,8 +367,17 @@
     "Copy Safety":         { "main": [[{ "node": "Fill Safety",        "type": "main", "index": 0 }]] },
     "Fill Safety":         { "main": [[{ "node": "Copy EC",            "type": "main", "index": 0 }]] },
     "Copy EC":             { "main": [[{ "node": "Fill EC",            "type": "main", "index": 0 }]] },
-    "Fill EC":             { "main": [[{ "node": "Write Back",         "type": "main", "index": 0 }]] },
-    "Write Back":          { "main": [[{ "node": "Send Notification",  "type": "main", "index": 0 }]] }
+    "Fill EC":             { "main": [[{ "node": "Export SA PDF",          "type": "main", "index": 0 }]] },
+    "Export SA PDF":       { "main": [[{ "node": "Upload SA to DocuSeal",  "type": "main", "index": 0 }]] },
+    "Upload SA to DocuSeal": { "main": [[{ "node": "Submit SA",            "type": "main", "index": 0 }]] },
+    "Submit SA":           { "main": [[{ "node": "Export Safety PDF",      "type": "main", "index": 0 }]] },
+    "Export Safety PDF":   { "main": [[{ "node": "Upload Safety to DocuSeal", "type": "main", "index": 0 }]] },
+    "Upload Safety to DocuSeal": { "main": [[{ "node": "Submit Safety",    "type": "main", "index": 0 }]] },
+    "Submit Safety":       { "main": [[{ "node": "Export EC PDF",          "type": "main", "index": 0 }]] },
+    "Export EC PDF":       { "main": [[{ "node": "Upload EC to DocuSeal",  "type": "main", "index": 0 }]] },
+    "Upload EC to DocuSeal": { "main": [[{ "node": "Submit EC",            "type": "main", "index": 0 }]] },
+    "Submit EC":           { "main": [[{ "node": "Write Back",             "type": "main", "index": 0 }]] },
+    "Write Back":          { "main": [[{ "node": "Send Notification",      "type": "main", "index": 0 }]] }
   },
   "settings": { "executionOrder": "v1" },
   "active": false
