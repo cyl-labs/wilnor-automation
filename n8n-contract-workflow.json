@@ -60,9 +60,10 @@
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.SA_TEMPLATE }}/copy",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
-        "contentType": "json",
+        "contentType": "raw",
+        "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $json.SA_NAME, parents: [$json.FOLDER_ID] }) }}"
       },
       "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
@@ -77,9 +78,10 @@
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
-        "contentType": "json",
+        "contentType": "raw",
+        "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
       "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
@@ -94,9 +96,10 @@
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.SAFETY_TEMPLATE }}/copy",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
-        "contentType": "json",
+        "contentType": "raw",
+        "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SAFETY_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
       },
       "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
@@ -111,9 +114,10 @@
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
-        "contentType": "json",
+        "contentType": "raw",
+        "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
       "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
@@ -128,9 +132,10 @@
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.EC_TEMPLATE }}/copy",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
-        "contentType": "json",
+        "contentType": "raw",
+        "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EC_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
       },
       "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
@@ -145,9 +150,10 @@
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
+        "nodeCredentialType": "googleApi",
         "sendBody": true,
-        "contentType": "json",
+        "contentType": "raw",
+        "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
       "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
