@@ -1,0 +1,214 @@
+{
+  "name": "Contract Generator",
+  "nodes": [
+    {
+      "id": "cg01-schedule",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+        }
+      }
+    },
+    {
+      "id": "cg02-read-sheet",
+      "name": "Read Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [460, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Form Responses 1", "mode": "name" },
+        "options": {},
+        "authentication": "serviceAccount"
+      },
+      "credentials": { "googleApi": { "id": "hJIK4knNVdFbbeYJ", "name": "Wilnor Sheets API" } }
+    },
+    {
+      "id": "cg03-filter",
+      "name": "Filter New Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const allRows = $input.all().map((i, idx) => ({ ...i.json, _idx: idx }));\nconst newRows = allRows.filter(row =>\n  String(row['Contract Created'] || '').trim().toLowerCase() !== 'yes'\n);\nif (newRows.length === 0) return [];\nconst row = newRows[0];\nconst { _idx, ...rest } = row;\nreturn [{ json: { ...rest, ROW_NUMBER: _idx + 2 } }];\n"
+      }
+    },
+    {
+      "id": "cg04-build",
+      "name": "Build Replacements",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const row = $input.item.json;\n\nfunction getVal(row, key) {\n  if (row[key] !== undefined) return String(row[key] || '').trim();\n  const found = Object.keys(row).find(k => k.trim() === key);\n  return found ? String(row[found] || '').trim() : '';\n}\n\nconst employerName = getVal(row, 'Employer Name');\nconst maidName = getVal(row, 'Maid Name');\nconst label = employerName + ' — ' + maidName;\n\nconst pairs = [\n  ['{{DATE}}',         getVal(row, 'Starting Date')],\n  ['{{EMPLOYERNAME}}', employerName],\n  ['{{NRIC}}',         getVal(row, 'NRIC')],\n  ['{{ADDRESS}}',      getVal(row, 'Address')],\n  ['{{AGENCYFEE}}',    getVal(row, 'Agency Fee')],\n  ['{{LOAN}}',         getVal(row, 'Loan')],\n  ['{{SERVICE}}',      '12'],\n  ['{{MAIDNAME}}',     maidName],\n  ['{{BASIC}}',        getVal(row, 'Basic salary')],\n  ['{{OFF}}',          getVal(row, 'Off')],\n  ['{{SALARY}}',       getVal(row, 'Total salary')],\n  ['{{PASSPORT}}',     getVal(row, 'Passport') || getVal(row, 'Passport ')],\n  ['{{PHONE}}',        getVal(row, 'Phone')],\n  ['{{WP}}',           getVal(row, 'WP')],\n  ['{{SALARYDATE}}',   getVal(row, 'Salary payment day')],\n  ['{{COMPENSATION}}', getVal(row, 'Compensation')],\n  ['{{REPATRIATION}}', getVal(row, 'Repatriation destination')],\n  ['{{COUNTRY}}',      getVal(row, 'Country')],\n];\n\nconst batchRequests = pairs.map(([find, replace]) => ({\n  replaceAllText: {\n    containsText: { text: find, matchCase: true },\n    replaceText: replace,\n  }\n}));\n\nreturn {\n  json: {\n    TIMESTAMP:       getVal(row, 'Timestamp'),\n    ROW_NUMBER:      row.ROW_NUMBER,\n    EMPLOYER_NAME:   employerName,\n    MAID_NAME:       maidName,\n    EMAIL:           getVal(row, 'Email'),\n    BATCH_REQUESTS:  batchRequests,\n    SA_NAME:         'Service Agreement — ' + label,\n    SAFETY_NAME:     'Safety Agreement — ' + label,\n    EC_NAME:         'Employment Contract — ' + label,\n    FOLDER_ID:       '1exoPi9K0SInFjzf7U16w_cbsttY3zJpw',\n    SA_TEMPLATE:     '1XKvdaUJIjAVKr_ZlAqVokLNJLZzZ23w2w4dBc5cZjvM',\n    SAFETY_TEMPLATE: '1fBnLlN3r2oWUZk4FHeQHWEHKhzm2w8wSpx8foA5aZ2M',\n    EC_TEMPLATE:     '19RNlwnaPo3IGMh2mXNk5K97o1MCJ-lG8cCXLrRODMn4',\n  }\n};\n"
+      }
+    },
+    {
+      "id": "cg05-copy-sa",
+      "name": "Copy SA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.SA_TEMPLATE }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ name: $json.SA_NAME, parents: [$json.FOLDER_ID] }) }}"
+      },
+      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+    },
+    {
+      "id": "cg06-fill-sa",
+      "name": "Fill SA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
+      },
+      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+    },
+    {
+      "id": "cg07-copy-safety",
+      "name": "Copy Safety",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1560, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.SAFETY_TEMPLATE }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SAFETY_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+      },
+      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+    },
+    {
+      "id": "cg08-fill-safety",
+      "name": "Fill Safety",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1780, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
+      },
+      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+    },
+    {
+      "id": "cg09-copy-ec",
+      "name": "Copy EC",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2000, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.EC_TEMPLATE }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EC_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+      },
+      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+    },
+    {
+      "id": "cg10-fill-ec",
+      "name": "Fill EC",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2220, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
+      },
+      "credentials": { "googleApi": { "id": "FAmftf6yqsKi64cP", "name": "Wilnor Google Calendar" } }
+    },
+    {
+      "id": "cg11-writeback",
+      "name": "Write Back",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [2440, 300],
+      "parameters": {
+        "operation": "update",
+        "documentId": { "__rl": true, "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Form Responses 1", "mode": "name" },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $('Build Replacements').item.json.TIMESTAMP }}",
+            "Contract Created": "yes"
+          },
+          "matchingColumns": ["Timestamp"]
+        },
+        "options": {},
+        "authentication": "serviceAccount"
+      },
+      "credentials": { "googleApi": { "id": "hJIK4knNVdFbbeYJ", "name": "Wilnor Sheets API" } }
+    },
+    {
+      "id": "cg12-email",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [2660, 300],
+      "parameters": {
+        "sendTo": "cyllabsdigital@gmail.com",
+        "subject": "=📄 New Contracts Ready — {{ $('Build Replacements').item.json.EMPLOYER_NAME }} & {{ $('Build Replacements').item.json.MAID_NAME }}",
+        "emailType": "html",
+        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">📄 Contracts Ready to Send</h2>' + '<p>Contracts have been generated for <strong>' + $('Build Replacements').item.json.EMPLOYER_NAME + '</strong> and helper <strong>' + $('Build Replacements').item.json.MAID_NAME + '</strong>.</p>' + '<p>Open each document, download as PDF, then upload to DocuSeal to send for signing.</p>' + '<ul style=\"line-height:2;\">' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy SA').item.json.id + '/edit\">Service Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Safety').item.json.id + '/edit\">Safety Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy EC').item.json.id + '/edit\">Employment Contract</a></li>' + '</ul>' + '</div>' }}",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GMAIL_CREDENTIAL_ID",
+          "name": "Gmail Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger":    { "main": [[{ "node": "Read Sheet",         "type": "main", "index": 0 }]] },
+    "Read Sheet":          { "main": [[{ "node": "Filter New Rows",    "type": "main", "index": 0 }]] },
+    "Filter New Rows":     { "main": [[{ "node": "Build Replacements", "type": "main", "index": 0 }]] },
+    "Build Replacements":  { "main": [[{ "node": "Copy SA",            "type": "main", "index": 0 }]] },
+    "Copy SA":             { "main": [[{ "node": "Fill SA",            "type": "main", "index": 0 }]] },
+    "Fill SA":             { "main": [[{ "node": "Copy Safety",        "type": "main", "index": 0 }]] },
+    "Copy Safety":         { "main": [[{ "node": "Fill Safety",        "type": "main", "index": 0 }]] },
+    "Fill Safety":         { "main": [[{ "node": "Copy EC",            "type": "main", "index": 0 }]] },
+    "Copy EC":             { "main": [[{ "node": "Fill EC",            "type": "main", "index": 0 }]] },
+    "Fill EC":             { "main": [[{ "node": "Write Back",         "type": "main", "index": 0 }]] },
+    "Write Back":          { "main": [[{ "node": "Send Notification",  "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
