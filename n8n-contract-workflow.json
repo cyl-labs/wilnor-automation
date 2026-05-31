@@ -60,13 +60,13 @@
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.SA_TEMPLATE }}/copy",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $json.SA_NAME, parents: [$json.FOLDER_ID] }) }}"
       },
-      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
       "id": "cg06-fill-sa",
@@ -78,13 +78,13 @@
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
-      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
       "id": "cg07-copy-safety",
@@ -96,13 +96,13 @@
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.SAFETY_TEMPLATE }}/copy",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SAFETY_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
       },
-      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
       "id": "cg08-fill-safety",
@@ -114,13 +114,13 @@
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
-      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
       "id": "cg09-copy-ec",
@@ -132,13 +132,13 @@
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.EC_TEMPLATE }}/copy",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EC_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
       },
-      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
       "id": "cg10-fill-ec",
@@ -150,13 +150,13 @@
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
         "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleApi",
+        "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
         "body": "={{ JSON.stringify({ requests: $('Build Replacements').item.json.BATCH_REQUESTS }) }}"
       },
-      "credentials": { "googleApi": { "id": "ya8pDXXf7KMPXuDu", "name": "Wilnor Drive API" } }
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
       "id": "cg11-writeback",
