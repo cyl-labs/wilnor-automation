@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Contracts — Wilnor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .card { background: white; border-radius: 12px; padding: 40px; width: 100%; max-width: 420px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    h1 { font-size: 22px; color: #222; margin-bottom: 6px; }
+    p { color: #666; font-size: 14px; margin-bottom: 28px; line-height: 1.5; }
+    label { display: block; font-size: 13px; font-weight: bold; color: #444; margin-bottom: 6px; }
+    input[type="number"] { width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: border-color 0.2s; }
+    input[type="number"]:focus { border-color: #4f46e5; }
+    button { width: 100%; margin-top: 16px; padding: 14px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+    button:hover { background: #3730a3; }
+    button:disabled { background: #a5b4fc; cursor: not-allowed; }
+    .status { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 14px; display: none; }
+    .status.success { background: #dcfce7; color: #166534; display: block; }
+    .status.error { background: #fee2e2; color: #991b1b; display: block; }
+    .hint { margin-top: 20px; font-size: 12px; color: #999; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📄 Generate Contracts</h1>
+    <p>Enter the row number from the Master File sheet for the client you want to generate contracts for.</p>
+
+    <label for="row">Row Number</label>
+    <input type="number" id="row" min="2" placeholder="e.g. 5" autofocus>
+
+    <button id="btn" onclick="generate()">Generate Contracts</button>
+    <div class="status" id="status"></div>
+    <p class="hint">You'll receive an email with links to the 3 documents once done.</p>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://n8n.cyllabs.com/webhook/generate-contracts';
+
+    async function generate() {
+      const row = parseInt(document.getElementById('row').value);
+      const btn = document.getElementById('btn');
+      const status = document.getElementById('status');
+
+      status.className = 'status';
+      status.textContent = '';
+
+      if (!row || row < 2) {
+        status.className = 'status error';
+        status.textContent = 'Please enter a valid row number (2 or higher).';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ row })
+        });
+
+        if (res.ok) {
+          status.className = 'status success';
+          status.textContent = '✓ Contracts are being generated for row ' + row + '. Check your email shortly.';
+          document.getElementById('row').value = '';
+        } else {
+          throw new Error('Server returned ' + res.status);
+        }
+      } catch (err) {
+        status.className = 'status error';
+        status.textContent = 'Something went wrong: ' + err.message;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Generate Contracts';
+    }
+
+    document.getElementById('row').addEventListener('keydown', e => {
+      if (e.key === 'Enter') generate();
+    });
+  </script>
+</body>
+</html>
