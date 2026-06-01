@@ -161,164 +161,11 @@
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
-      "id": "cg13-export-sa",
-      "name": "Export SA PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [2440, 300],
-      "parameters": {
-        "method": "GET",
-        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy SA').item.json.id }}/export?mimeType=application/pdf",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
-        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
-      },
-      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
-    },
-    {
-      "id": "cg14-upload-sa",
-      "name": "Upload SA to DocuSeal",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [2660, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates/pdf",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "multipartFormData",
-        "bodyParameters": { "parameters": [
-          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
-          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.SA_NAME }}" }
-        ]}
-      }
-    },
-    {
-      "id": "cg15-submit-sa",
-      "name": "Submit SA",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [2880, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/submissions",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
-      }
-    },
-    {
-      "id": "cg16-export-safety",
-      "name": "Export Safety PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3100, 300],
-      "parameters": {
-        "method": "GET",
-        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy Safety').item.json.id }}/export?mimeType=application/pdf",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
-        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
-      },
-      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
-    },
-    {
-      "id": "cg17-upload-safety",
-      "name": "Upload Safety to DocuSeal",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3320, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates/pdf",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "multipartFormData",
-        "bodyParameters": { "parameters": [
-          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
-          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.SAFETY_NAME }}" }
-        ]}
-      }
-    },
-    {
-      "id": "cg18-submit-safety",
-      "name": "Submit Safety",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3540, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/submissions",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
-      }
-    },
-    {
-      "id": "cg19-export-ec",
-      "name": "Export EC PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3540, 300],
-      "parameters": {
-        "method": "GET",
-        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy EC').item.json.id }}/export?mimeType=application/pdf",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
-        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
-      },
-      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
-    },
-    {
-      "id": "cg20-upload-ec",
-      "name": "Upload EC to DocuSeal",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3760, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates/pdf",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "multipartFormData",
-        "bodyParameters": { "parameters": [
-          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
-          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.EC_NAME }}" }
-        ]}
-      }
-    },
-    {
-      "id": "cg21-submit-ec",
-      "name": "Submit EC",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3980, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/submissions",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
-      }
-    },
-    {
       "id": "cg22-copy-maid-receipt",
       "name": "Copy Maid Receipt",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [4420, 300],
+      "position": [2440, 300],
       "parameters": {
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.MAID_RECEIPT_TEMPLATE }}/copy",
@@ -336,7 +183,7 @@
       "name": "Fill Maid Receipt",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [4640, 300],
+      "position": [2660, 300],
       "parameters": {
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
@@ -354,7 +201,7 @@
       "name": "Copy Employer Receipt",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [4860, 300],
+      "position": [2880, 300],
       "parameters": {
         "method": "POST",
         "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.EMPLOYER_RECEIPT_TEMPLATE }}/copy",
@@ -372,7 +219,7 @@
       "name": "Fill Employer Receipt",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [5080, 300],
+      "position": [3100, 300],
       "parameters": {
         "method": "POST",
         "url": "=https://docs.googleapis.com/v1/documents/{{ $json.id }}:batchUpdate",
@@ -386,62 +233,11 @@
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
     {
-      "id": "cg26-export-employer-receipt",
-      "name": "Export Employer Receipt PDF",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [5300, 300],
-      "parameters": {
-        "method": "GET",
-        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy Employer Receipt').item.json.id }}/export?mimeType=application/pdf",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "googleDriveOAuth2Api",
-        "options": { "response": { "response": { "responseFormat": "file", "outputPropertyName": "data" } } }
-      },
-      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
-    },
-    {
-      "id": "cg27-upload-employer-receipt",
-      "name": "Upload Employer Receipt to DocuSeal",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [5520, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates/pdf",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "multipartFormData",
-        "bodyParameters": { "parameters": [
-          { "parameterType": "formBinaryData", "name": "file", "inputDataFieldName": "data" },
-          { "parameterType": "formData", "name": "name", "value": "={{ $('Build Replacements').item.json.EMPLOYER_RECEIPT_NAME }}" }
-        ]}
-      }
-    },
-    {
-      "id": "cg28-submit-employer-receipt",
-      "name": "Submit Employer Receipt",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [5740, 300],
-      "parameters": {
-        "method": "POST",
-        "url": "https://sign.cyllabs.com/api/submissions",
-        "sendHeaders": true,
-        "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ template_id: $json.id, submitters: [{ name: $('Build Replacements').item.json.EMPLOYER_NAME, email: $('Build Replacements').item.json.EMAIL, role: 'Employer' }] }) }}"
-      }
-    },
-    {
       "id": "cg11-writeback",
       "name": "Write Back",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
-      "position": [5960, 300],
+      "position": [3320, 300],
       "parameters": {
         "operation": "update",
         "documentId": { "__rl": true, "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw", "mode": "id" },
@@ -464,12 +260,12 @@
       "name": "Send Notification",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [6180, 300],
+      "position": [3540, 300],
       "parameters": {
         "sendTo": "cyllabsdigital@gmail.com",
-        "subject": "=📄 New Contracts Ready — {{ $('Build Replacements').item.json.EMPLOYER_NAME }} & {{ $('Build Replacements').item.json.MAID_NAME }}",
+        "subject": "=📄 Documents Ready — {{ $('Build Replacements').item.json.EMPLOYER_NAME }} & {{ $('Build Replacements').item.json.MAID_NAME }}",
         "emailType": "html",
-        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">📄 Contracts Sent for Signing</h2>' + '<p>Contracts have been generated and sent to <strong>' + $('Build Replacements').item.json.EMPLOYER_NAME + '</strong> (' + $('Build Replacements').item.json.EMAIL + ') for signing.</p>' + '<p>They will receive signing emails from DocuSeal. You can also review and sign as agency at <a href=\"https://sign.cyllabs.com\">sign.cyllabs.com</a>.</p>' + '<p style=\"margin-top:16px;\"><strong>Google Doc links:</strong></p>' + '<ul style=\"line-height:2;\">' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy SA').item.json.id + '/edit\">Service Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Safety').item.json.id + '/edit\">Safety Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy EC').item.json.id + '/edit\">Employment Contract</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Maid Receipt').item.json.id + '/edit\">Maid Receipt</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Employer Receipt').item.json.id + '/edit\">Employer Receipt</a></li>' + '</ul>' + '</div>' }}",
+        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">📄 Documents Ready</h2>' + '<p>All 5 documents have been generated for <strong>' + $('Build Replacements').item.json.EMPLOYER_NAME + '</strong> & <strong>' + $('Build Replacements').item.json.MAID_NAME + '</strong>.</p>' + '<p><a href=\"https://drive.google.com/drive/folders/1exoPi9K0SInFjzf7U16w_cbsttY3zJpw\" style=\"display:inline-block;padding:12px 20px;background:#4f46e5;color:white;border-radius:8px;text-decoration:none;font-weight:bold;margin-right:12px;\">Open Drive Folder</a>' + '<a href=\"https://sign.cyllabs.com\" style=\"display:inline-block;padding:12px 20px;background:#059669;color:white;border-radius:8px;text-decoration:none;font-weight:bold;\">Go to DocuSeal</a></p>' + '<p style=\"margin-top:16px;\"><strong>Documents:</strong></p>' + '<ul style=\"line-height:2;\">' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy SA').item.json.id + '/edit\">Service Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Safety').item.json.id + '/edit\">Safety Agreement</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy EC').item.json.id + '/edit\">Employment Contract</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Maid Receipt').item.json.id + '/edit\">Maid Receipt</a></li>' + '<li><a href=\"https://docs.google.com/document/d/' + $('Copy Employer Receipt').item.json.id + '/edit\">Employer Receipt</a></li>' + '</ul>' + '</div>' }}",
         "options": {}
       },
       "credentials": {
@@ -481,33 +277,21 @@
     }
   ],
   "connections": {
-    "Webhook":                  { "main": [[{ "node": "Read Sheet",              "type": "main", "index": 0 }]] },
-    "Read Sheet":               { "main": [[{ "node": "Pick Row",                "type": "main", "index": 0 }]] },
-    "Pick Row":                 { "main": [[{ "node": "Build Replacements",      "type": "main", "index": 0 }]] },
-    "Build Replacements":       { "main": [[{ "node": "Copy SA",                 "type": "main", "index": 0 }]] },
-    "Copy SA":                  { "main": [[{ "node": "Fill SA",                 "type": "main", "index": 0 }]] },
-    "Fill SA":                  { "main": [[{ "node": "Copy Safety",             "type": "main", "index": 0 }]] },
-    "Copy Safety":              { "main": [[{ "node": "Fill Safety",             "type": "main", "index": 0 }]] },
-    "Fill Safety":              { "main": [[{ "node": "Copy EC",                 "type": "main", "index": 0 }]] },
-    "Copy EC":                  { "main": [[{ "node": "Fill EC",                 "type": "main", "index": 0 }]] },
-    "Fill EC":                  { "main": [[{ "node": "Export SA PDF",           "type": "main", "index": 0 }]] },
-    "Export SA PDF":                    { "main": [[{ "node": "Upload SA to DocuSeal",              "type": "main", "index": 0 }]] },
-    "Upload SA to DocuSeal":            { "main": [[{ "node": "Submit SA",                          "type": "main", "index": 0 }]] },
-    "Submit SA":                        { "main": [[{ "node": "Export Safety PDF",                  "type": "main", "index": 0 }]] },
-    "Export Safety PDF":                { "main": [[{ "node": "Upload Safety to DocuSeal",          "type": "main", "index": 0 }]] },
-    "Upload Safety to DocuSeal":        { "main": [[{ "node": "Submit Safety",                      "type": "main", "index": 0 }]] },
-    "Submit Safety":                    { "main": [[{ "node": "Export EC PDF",                      "type": "main", "index": 0 }]] },
-    "Export EC PDF":                    { "main": [[{ "node": "Upload EC to DocuSeal",              "type": "main", "index": 0 }]] },
-    "Upload EC to DocuSeal":            { "main": [[{ "node": "Submit EC",                          "type": "main", "index": 0 }]] },
-    "Submit EC":                        { "main": [[{ "node": "Copy Maid Receipt",                  "type": "main", "index": 0 }]] },
-    "Copy Maid Receipt":        { "main": [[{ "node": "Fill Maid Receipt",       "type": "main", "index": 0 }]] },
-    "Fill Maid Receipt":        { "main": [[{ "node": "Copy Employer Receipt",   "type": "main", "index": 0 }]] },
-    "Copy Employer Receipt":    { "main": [[{ "node": "Fill Employer Receipt",   "type": "main", "index": 0 }]] },
-    "Fill Employer Receipt":    { "main": [[{ "node": "Export Employer Receipt PDF", "type": "main", "index": 0 }]] },
-    "Export Employer Receipt PDF":      { "main": [[{ "node": "Upload Employer Receipt to DocuSeal", "type": "main", "index": 0 }]] },
-    "Upload Employer Receipt to DocuSeal": { "main": [[{ "node": "Submit Employer Receipt",         "type": "main", "index": 0 }]] },
-    "Submit Employer Receipt":          { "main": [[{ "node": "Write Back",                         "type": "main", "index": 0 }]] },
-    "Write Back":               { "main": [[{ "node": "Send Notification",       "type": "main", "index": 0 }]] }
+    "Webhook":              { "main": [[{ "node": "Read Sheet",           "type": "main", "index": 0 }]] },
+    "Read Sheet":           { "main": [[{ "node": "Pick Row",             "type": "main", "index": 0 }]] },
+    "Pick Row":             { "main": [[{ "node": "Build Replacements",   "type": "main", "index": 0 }]] },
+    "Build Replacements":   { "main": [[{ "node": "Copy SA",              "type": "main", "index": 0 }]] },
+    "Copy SA":              { "main": [[{ "node": "Fill SA",              "type": "main", "index": 0 }]] },
+    "Fill SA":              { "main": [[{ "node": "Copy Safety",          "type": "main", "index": 0 }]] },
+    "Copy Safety":          { "main": [[{ "node": "Fill Safety",          "type": "main", "index": 0 }]] },
+    "Fill Safety":          { "main": [[{ "node": "Copy EC",              "type": "main", "index": 0 }]] },
+    "Copy EC":              { "main": [[{ "node": "Fill EC",              "type": "main", "index": 0 }]] },
+    "Fill EC":              { "main": [[{ "node": "Copy Maid Receipt",    "type": "main", "index": 0 }]] },
+    "Copy Maid Receipt":    { "main": [[{ "node": "Fill Maid Receipt",    "type": "main", "index": 0 }]] },
+    "Fill Maid Receipt":    { "main": [[{ "node": "Copy Employer Receipt","type": "main", "index": 0 }]] },
+    "Copy Employer Receipt":{ "main": [[{ "node": "Fill Employer Receipt","type": "main", "index": 0 }]] },
+    "Fill Employer Receipt":{ "main": [[{ "node": "Write Back",           "type": "main", "index": 0 }]] },
+    "Write Back":           { "main": [[{ "node": "Send Notification",    "type": "main", "index": 0 }]] }
   },
   "settings": { "executionOrder": "v1" },
   "active": false
