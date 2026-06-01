@@ -183,7 +183,7 @@
       "position": [2660, 300],
       "parameters": {
         "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates",
+        "url": "https://sign.cyllabs.com/api/templates/pdf",
         "sendHeaders": true,
         "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
         "sendBody": true,
@@ -234,7 +234,7 @@
       "position": [3320, 300],
       "parameters": {
         "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates",
+        "url": "https://sign.cyllabs.com/api/templates/pdf",
         "sendHeaders": true,
         "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
         "sendBody": true,
@@ -285,7 +285,7 @@
       "position": [3760, 300],
       "parameters": {
         "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates",
+        "url": "https://sign.cyllabs.com/api/templates/pdf",
         "sendHeaders": true,
         "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
         "sendBody": true,
@@ -408,7 +408,7 @@
       "position": [5520, 300],
       "parameters": {
         "method": "POST",
-        "url": "https://sign.cyllabs.com/api/templates",
+        "url": "https://sign.cyllabs.com/api/templates/pdf",
         "sendHeaders": true,
         "headerParameters": { "parameters": [{ "name": "X-Auth-Token", "value": "u76oZg21N8tvAJYJCpVFu9yYMvS57fsbZajFkktp8Ls" }] },
         "sendBody": true,
