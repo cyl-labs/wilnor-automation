@@ -20,14 +20,14 @@
     },
     {
       "id": "pr02-read-sheet",
-      "name": "Read Sheet",
+      "name": "Read Tracker",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [460, 300],
       "parameters": {
         "operation": "read",
-        "documentId": { "__rl": true, "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw", "mode": "id" },
-        "sheetName": { "__rl": true, "value": "Form Responses 1", "mode": "name" },
+        "documentId": { "__rl": true, "value": "1JRaFDly7TFKdcy7jhbSVaClimFdzRlA_O75DRGM7-Sc", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Sheet1", "mode": "name" },
         "options": {},
         "authentication": "serviceAccount"
       },
@@ -41,7 +41,7 @@
       "position": [680, 300],
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const todayDay = new Date().getDate();\n\nfunction getVal(row, key) {\n  if (row[key] !== undefined) return String(row[key] || '').trim();\n  const found = Object.keys(row).find(k => k.trim() === key);\n  return found ? String(row[found] || '').trim() : '';\n}\n\nconst rows = $input.all().map(i => i.json);\n\nconst due = rows.filter(row => {\n  const payDay = parseInt(getVal(row, 'Salary payment day'));\n  if (isNaN(payDay)) return false;\n  return payDay === todayDay;\n});\n\nconst today = new Date().toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Singapore' });\n\nreturn [{ json: {\n  hasDue: due.length > 0,\n  count: due.length,\n  today,\n  todayDay,\n  items: due.map(r => ({\n    employer: getVal(r, 'Employer Name'),\n    maid: getVal(r, 'Maid Name'),\n    salary: getVal(r, 'Total salary'),\n    payDay: getVal(r, 'Salary payment day')\n  }))\n} }];\n"
+        "jsCode": "const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Singapore' }));\nconst todayDay = now.getDate();\nconst thisMonth = now.getMonth();\nconst thisYear = now.getFullYear();\n\nconst rows = $input.all().map(i => i.json);\n\nconst due = rows.filter(row => {\n  if (!row['Employer Name']) return false;\n  const payDay = parseInt(row['Payment Due Day']);\n  if (isNaN(payDay) || payDay !== todayDay) return false;\n\n  // Check if already paid this month\n  const lastPaid = row['Last Paid Date'];\n  if (lastPaid) {\n    const paidDate = new Date(lastPaid);\n    if (!isNaN(paidDate) && paidDate.getMonth() === thisMonth && paidDate.getFullYear() === thisYear) {\n      return false; // already paid this month\n    }\n  }\n  return true;\n});\n\nconst today = now.toLocaleDateString('en-SG', { day: 'numeric', month: 'long', year: 'numeric' });\n\nreturn [{ json: {\n  hasDue: due.length > 0,\n  count: due.length,\n  today,\n  items: due.map(r => ({\n    employer: r['Employer Name'] || '',\n    maid: r['Maid Name'] || '',\n    salary: r['Salary Amount'] || '',\n    payDay: r['Payment Due Day'] || '',\n    notes: r['Notes'] || ''\n  }))\n} }];\n"
       }
     },
     {
@@ -75,7 +75,7 @@
         "sendTo": "cyllabsdigital@gmail.com",
         "subject": "=💰 Salary Due Today ({{ $json.today }}) — {{ $json.count }} employer(s)",
         "emailType": "html",
-        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">💰 Salary Payment Due Today</h2>' + '<p>The following employers are due to pay salary today, <strong>' + $json.today + '</strong>:</p>' + '<table style=\"width:100%;border-collapse:collapse;margin-top:16px;\">' + '<tr style=\"background:#f3f4f6;\"><th style=\"padding:10px;text-align:left;border:1px solid #e5e7eb;\">Employer</th><th style=\"padding:10px;text-align:left;border:1px solid #e5e7eb;\">Helper</th><th style=\"padding:10px;text-align:right;border:1px solid #e5e7eb;\">Salary</th></tr>' + $json.items.map(i => '<tr><td style=\"padding:10px;border:1px solid #e5e7eb;\">' + i.employer + '</td><td style=\"padding:10px;border:1px solid #e5e7eb;\">' + i.maid + '</td><td style=\"padding:10px;text-align:right;border:1px solid #e5e7eb;\">$' + i.salary + '</td></tr>').join('') + '</table>' + '</div>' }}",
+        "message": "={{ '<div style=\"font-family:Arial,sans-serif;max-width:600px;\">' + '<h2 style=\"color:#222;\">💰 Salary Payment Due Today</h2>' + '<p>The following employers are due to pay salary today, <strong>' + $json.today + '</strong>:</p>' + '<table style=\"width:100%;border-collapse:collapse;margin-top:16px;\">' + '<tr style=\"background:#f3f4f6;\"><th style=\"padding:10px;text-align:left;border:1px solid #e5e7eb;\">Employer</th><th style=\"padding:10px;text-align:left;border:1px solid #e5e7eb;\">Helper</th><th style=\"padding:10px;text-align:right;border:1px solid #e5e7eb;\">Salary</th><th style=\"padding:10px;text-align:left;border:1px solid #e5e7eb;\">Notes</th></tr>' + $json.items.map(i => '<tr><td style=\"padding:10px;border:1px solid #e5e7eb;\">' + i.employer + '</td><td style=\"padding:10px;border:1px solid #e5e7eb;\">' + i.maid + '</td><td style=\"padding:10px;text-align:right;border:1px solid #e5e7eb;\">$' + i.salary + '</td><td style=\"padding:10px;border:1px solid #e5e7eb;\">' + i.notes + '</td></tr>').join('') + '</table>' + '<p style=\"margin-top:16px;color:#666;font-size:13px;\">Mark paid in the <a href=\"https://docs.google.com/spreadsheets/d/1JRaFDly7TFKdcy7jhbSVaClimFdzRlA_O75DRGM7-Sc\">Salary Tracker</a> once confirmed.</p>' + '</div>' }}",
         "options": {}
       },
       "credentials": {
@@ -87,10 +87,10 @@
     }
   ],
   "connections": {
-    "Every Day 8am": { "main": [[{ "node": "Read Sheet",    "type": "main", "index": 0 }]] },
-    "Read Sheet":    { "main": [[{ "node": "Find Due Today","type": "main", "index": 0 }]] },
-    "Find Due Today":{ "main": [[{ "node": "Has Due?",      "type": "main", "index": 0 }]] },
-    "Has Due?":      { "main": [[{ "node": "Send Reminder", "type": "main", "index": 0 }], []] }
+    "Every Day 8am": { "main": [[{ "node": "Read Tracker",   "type": "main", "index": 0 }]] },
+    "Read Tracker":  { "main": [[{ "node": "Find Due Today", "type": "main", "index": 0 }]] },
+    "Find Due Today":{ "main": [[{ "node": "Has Due?",       "type": "main", "index": 0 }]] },
+    "Has Due?":      { "main": [[{ "node": "Send Reminder",  "type": "main", "index": 0 }], []] }
   },
   "settings": { "executionOrder": "v1", "timezone": "Asia/Singapore" },
   "active": false
