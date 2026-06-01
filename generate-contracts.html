@@ -122,6 +122,7 @@
     }
 
     async function generate() {
+      const rowToGenerate = pendingRow;
       closeModal();
       const btn = document.getElementById('btn');
       const status = document.getElementById('status');
@@ -135,12 +136,12 @@
         const res = await fetch(WEBHOOK_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ row: pendingRow })
+          body: JSON.stringify({ row: rowToGenerate })
         });
 
         if (res.ok) {
           status.className = 'status success';
-          status.textContent = '✓ Contracts are being generated for row ' + pendingRow + '. Check your email shortly.';
+          status.textContent = '✓ Contracts are being generated for row ' + rowToGenerate + '. Check your email shortly.';
           document.getElementById('row').value = '';
         } else {
           throw new Error('Server returned ' + res.status);
