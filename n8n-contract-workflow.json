@@ -53,20 +53,38 @@
       }
     },
     {
-      "id": "cg05-copy-sa",
-      "name": "Copy SA",
+      "id": "cg04b-create-folder",
+      "name": "Create Folder",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [1120, 300],
       "parameters": {
         "method": "POST",
-        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.SA_TEMPLATE }}/copy",
+        "url": "https://www.googleapis.com/drive/v3/files",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "googleDriveOAuth2Api",
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ name: $json.SA_NAME, parents: [$json.FOLDER_ID] }) }}"
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EMPLOYER_NAME + ' — ' + $('Build Replacements').item.json.MAID_NAME, mimeType: 'application/vnd.google-apps.folder', parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+      },
+      "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
+    },
+    {
+      "id": "cg05-copy-sa",
+      "name": "Copy SA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Build Replacements').item.json.SA_TEMPLATE }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SA_NAME, parents: [$('Create Folder').item.json.id] }) }}"
       },
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
@@ -102,7 +120,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SAFETY_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.SAFETY_NAME, parents: [$('Create Folder').item.json.id] }) }}"
       },
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
@@ -138,7 +156,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EC_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EC_NAME, parents: [$('Create Folder').item.json.id] }) }}"
       },
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
@@ -174,7 +192,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.MAID_RECEIPT_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.MAID_RECEIPT_NAME, parents: [$('Create Folder').item.json.id] }) }}"
       },
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
@@ -210,7 +228,7 @@
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EMPLOYER_RECEIPT_NAME, parents: [$('Build Replacements').item.json.FOLDER_ID] }) }}"
+        "body": "={{ JSON.stringify({ name: $('Build Replacements').item.json.EMPLOYER_RECEIPT_NAME, parents: [$('Create Folder').item.json.id] }) }}"
       },
       "credentials": { "googleDriveOAuth2Api": { "id": "416DOTjrBY8KBw3p", "name": "Google Drive OAuth2 API" } }
     },
@@ -280,7 +298,8 @@
     "Webhook":              { "main": [[{ "node": "Read Sheet",           "type": "main", "index": 0 }]] },
     "Read Sheet":           { "main": [[{ "node": "Pick Row",             "type": "main", "index": 0 }]] },
     "Pick Row":             { "main": [[{ "node": "Build Replacements",   "type": "main", "index": 0 }]] },
-    "Build Replacements":   { "main": [[{ "node": "Copy SA",              "type": "main", "index": 0 }]] },
+    "Build Replacements":   { "main": [[{ "node": "Create Folder",        "type": "main", "index": 0 }]] },
+    "Create Folder":        { "main": [[{ "node": "Copy SA",              "type": "main", "index": 0 }]] },
     "Copy SA":              { "main": [[{ "node": "Fill SA",              "type": "main", "index": 0 }]] },
     "Fill SA":              { "main": [[{ "node": "Copy Safety",          "type": "main", "index": 0 }]] },
     "Copy Safety":          { "main": [[{ "node": "Fill Safety",          "type": "main", "index": 0 }]] },
