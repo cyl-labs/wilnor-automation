@@ -1,0 +1,69 @@
+{
+  "name": "Row Lookup",
+  "nodes": [
+    {
+      "id": "lk01-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "lookup-row",
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "lookup-row",
+        "responseMode": "lastNode"
+      }
+    },
+    {
+      "id": "lk02-read-sheet",
+      "name": "Read Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [460, 300],
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "value": "150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw", "mode": "id" },
+        "sheetName": { "__rl": true, "value": "Form Responses 1", "mode": "name" },
+        "options": {},
+        "authentication": "serviceAccount"
+      },
+      "credentials": { "googleApi": { "id": "hJIK4knNVdFbbeYJ", "name": "Wilnor Sheets API" } }
+    },
+    {
+      "id": "lk03-pick",
+      "name": "Pick Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const targetRow = Number($('Webhook').item.json.query.row);\nif (!targetRow || isNaN(targetRow) || targetRow < 2) {\n  return [{ json: { error: 'Invalid row number' } }];\n}\nconst allRows = $input.all().map((i, idx) => ({ ...i.json, _idx: idx }));\nconst match = allRows.find((r, idx) => (idx + 2) === targetRow);\nif (!match) {\n  return [{ json: { error: 'Row ' + targetRow + ' not found' } }];\n}\nfunction getVal(row, key) {\n  if (row[key] !== undefined) return String(row[key] || '').trim();\n  const found = Object.keys(row).find(k => k.trim() === key);\n  return found ? String(row[found] || '').trim() : '';\n}\nreturn [{ json: {\n  employer: getVal(match, 'Employer Name'),\n  maid: getVal(match, 'Maid Name'),\n  row: targetRow\n} }];\n"
+      }
+    },
+    {
+      "id": "lk04-respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Access-Control-Allow-Origin", "value": "https://wilnor.cyllabs.com" }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook":    { "main": [[{ "node": "Read Sheet", "type": "main", "index": 0 }]] },
+    "Read Sheet": { "main": [[{ "node": "Pick Row",   "type": "main", "index": 0 }]] },
+    "Pick Row":   { "main": [[{ "node": "Respond",    "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}

@@ -71,27 +71,9 @@
 
   <script>
     const WEBHOOK_URL = 'https://n8n.cyllabs.com/webhook/generate-contracts';
-    const SHEET_ID    = '150FbUAyIg_Lid4WiBn-Fk8jZk55oc0b5cyfIbpogxfw';
-    const SHEET_CSV   = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
-
-    // Column indices (0-based) from the master sheet
-    const COL_EMPLOYER = 30;
-    const COL_MAID     = 15;
+    const LOOKUP_URL  = 'https://n8n.cyllabs.com/webhook/lookup-row';
 
     let pendingRow = null;
-
-    function parseCSVRow(line) {
-      const result = [];
-      let cur = '', inQuotes = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') { inQuotes = !inQuotes; }
-        else if (ch === ',' && !inQuotes) { result.push(cur.trim()); cur = ''; }
-        else { cur += ch; }
-      }
-      result.push(cur.trim());
-      return result;
-    }
 
     async function lookup() {
       const rowInput = document.getElementById('row');
@@ -112,25 +94,16 @@
       btn.textContent = 'Looking up...';
 
       try {
-        const res = await fetch(SHEET_CSV);
-        if (!res.ok) throw new Error('Sheet returned ' + res.status);
-        const text = await res.text();
-        const lines = text.split('\n').filter(l => l.trim());
-        // row 2 in sheet = lines[1] (lines[0] is header)
-        const lineIndex = row - 1;
-        if (lineIndex >= lines.length || !lines[lineIndex]) {
-          throw new Error('Row ' + row + ' not found (sheet has ' + lines.length + ' rows including header)');
-        }
-        const cols = parseCSVRow(lines[lineIndex]);
-        const employer = cols[COL_EMPLOYER] || '(unknown)';
-        const maid     = cols[COL_MAID]     || '(unknown)';
+        const res = await fetch(LOOKUP_URL + '?row=' + row);
+        if (!res.ok) throw new Error('Lookup returned ' + res.status);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
 
         pendingRow = row;
-        document.getElementById('modal-employer').textContent = employer;
-        document.getElementById('modal-maid').textContent     = maid;
+        document.getElementById('modal-employer').textContent = data.employer || '(unknown)';
+        document.getElementById('modal-maid').textContent     = data.maid     || '(unknown)';
         document.getElementById('modal').classList.add('open');
       } catch (err) {
-        // Fallback: show modal with row number and error note
         status.className = 'status error';
         status.textContent = 'Could not look up names: ' + err.message;
         pendingRow = row;
